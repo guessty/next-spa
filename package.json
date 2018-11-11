@@ -1,0 +1,55 @@
+{
+  "name": "next-spa",
+  "version": "0.1.0",
+  "description": "A preconfigured solution for hosting a React app on Google Firebase.",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "repository": "https://github.com/guessty/next-spa.git",
+  "author": "guessty <christian.guest@outlook.com>",
+  "license": "MIT",
+  "files": [
+    "lib",
+    "bin",
+    "link.js",
+    "router.js",
+    "store.js"
+  ],
+  "scripts": {
+    "build:types": "tsc --emitDeclarationOnly",
+    "build:js": "babel src --out-dir ./ --extensions \".js,.jsx,.ts,.tsx\" --source-maps inline",
+    "build": "npm run build:types && npm run build:js"
+  },
+  "bin": {
+    "next-spa": "./bin/next-spa.js"
+  },
+  "peerDependencies": {
+    "next": "7.0.2",
+    "react": "16.5.2",
+    "react-dom": "16.5.2"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.1.2",
+    "@babel/core": "^7.1.2",
+    "@babel/preset-env": "^7.1.0",
+    "@babel/preset-typescript": "^7.1.0",
+    "@types/next": "^7.0.3",
+    "commander": "2.18.0",
+    "next": "7.0.2",
+    "react": "16.5.2",
+    "react-dom": "16.5.2",
+    "ts-loader": "5.1.1",
+    "typescript": "3.0.3"
+  },
+  "dependencies": {
+    "@babel/polyfill": "7.0.0",
+    "deep-object-diff": "^1.1.0",
+    "express": "^4.16.3",
+    "fs": "0.0.1-security",
+    "next-routes": "1.4.2",
+    "path": "0.12.7",
+    "require-fool-webpack": "2.0.0",
+    "unstated": "^2.1.1",
+    "webpack": "4.19.0",
+    "webpack-node-externals": "1.7.2"
+  }
+}

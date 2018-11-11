@@ -1,0 +1,19 @@
+{
+  "main": "./src/index.ts",
+  "compilerOptions": {
+    "declaration": true,
+    "declarationDir": "./",
+    "lib": ["es2017", "dom"],
+    "module": "es2015",
+    "moduleResolution": "node",
+    "noImplicitAny": true,
+    "outDir": "./",
+    "target": "es2015",
+    "jsx": "react",
+    "sourceMap": true
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": ["node_modules"]
+}
