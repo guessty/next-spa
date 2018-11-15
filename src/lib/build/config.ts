@@ -34,7 +34,7 @@ const generateDirRoutes = (dir: any, pathString:string = undefined, routes: any 
     } else if (page === '/_404' || page === '/404' || page === '/404/index') {
       const route = {
         pattern: '/404.html',
-        page: '/404',
+        page: page.replace('/index', ''),
       }
       routes.push(route)
     } else if (page !== '/_app' && page !== '/_document' && page !== '/_error') {
@@ -50,11 +50,11 @@ const generateDirRoutes = (dir: any, pathString:string = undefined, routes: any 
 
 const generateExportPathMap = (routes: any, nextSPAConfig: any) => {
   const allRoutes = [
-    { pattern: '/404.html', page: '/404' },
+    { pattern: '/404.html', page: '/_404' },
     ...routes,
     ...nextSPAConfig.fallback
-      ? [{ pattern: `/${nextSPAConfig.fallback}`, page: 'soft-404' }]
-      : [{ pattern: '/404.html', page: '/soft-404' }] ,
+      ? [{ pattern: `/${nextSPAConfig.fallback}`, page: `/${nextSPAConfig.fallback.replace('.html', '')}` }]
+      : [] ,
   ]
   
   return allRoutes.reduce((routeMap, route) => {
@@ -66,12 +66,7 @@ const generateExportPathMap = (routes: any, nextSPAConfig: any) => {
 }
 
 const withSPA = (config: any = {}) => {
-  const argv = parseArgs(process.argv.slice(2), {
-    alias: {
-      h: 'help'
-    },
-    boolean: ['h']
-  })
+  const argv = parseArgs(process.argv.slice(2), {})
 
   const argvPath = argv._[0] || '.'
 

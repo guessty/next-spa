@@ -6,11 +6,9 @@ import Loader from './pageLoader'
 
 export default (App: any) => class extends React.Component {
   static async getInitialProps(appContext: any) {
-    console.log('HOC Context: ', Object.keys(appContext))
     const appProps = (typeof App.getInitialProps === 'function') ?
       await App.getInitialProps(appContext) : {}
 
-    console.log('Init App Props: ', appProps)
     return {
       ...appProps,
     }
@@ -39,12 +37,12 @@ export default (App: any) => class extends React.Component {
   }
   isReady() {
     const { router }: any = this.props
+    console.log(router.pathname)
     return !this.isSPAPath() && router.pathname !== '/soft-404'
   }
   render() {
     const { pageProps }: any = this.props
     const { isSPAPath, isReady }: any = this.state
-
     const isPageLoading = isSPAPath && !isReady
 
     const appProps = {
@@ -55,8 +53,6 @@ export default (App: any) => class extends React.Component {
         ...pageProps,
       }
     }
-
-    console.log('HOC Props: ', appProps)
 
     return <App {...appProps} />
   }
