@@ -13,8 +13,11 @@ const Router = Routes.Router
 
 const withSPARouter = (App: any) => class extends React.Component {
   static async getInitialProps(appContext: any) {
+    console.log('HOC Context: ', Object.keys(appContext))
     const appProps = (typeof App.getInitialProps === 'function') ?
       await App.getInitialProps(appContext) : {}
+
+    console.log('Init App Props: ', appProps)
     return {
       ...appProps,
     }
@@ -59,6 +62,8 @@ const withSPARouter = (App: any) => class extends React.Component {
         ...pageProps,
       }
     }
+
+    console.log('HOC Props: ', appProps)
 
     return <App {...appProps} />
   }
