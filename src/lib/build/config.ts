@@ -58,7 +58,8 @@ const generateExportPathMap = (routes: any, nextSPAConfig: any) => {
   ]
   
   return allRoutes.reduce((routeMap, route) => {
-    const pattern = route.pattern.includes('/:') ? `/_next-spa${route.pattern}`: route.pattern
+    const pattern = route.pattern.includes('/:')
+      ? `/_next-spa${route.pattern.replace('/:', '/_')}`: route.pattern
     routeMap[pattern] = { page: route.page }
 
     return routeMap

@@ -37,7 +37,6 @@ export default (App: any) => class extends React.Component {
   }
   isReady() {
     const { router }: any = this.props
-    console.log(router.pathname)
     return !this.isSPAPath() && router.pathname !== '/soft-404'
   }
   render() {

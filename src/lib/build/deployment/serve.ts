@@ -19,7 +19,7 @@ const getRewrites = async (routes: any, config: any, fullRewrite: boolean) => {
         const source = getDynamicSource(route.pattern)
         dynamicRewrites.push({
           source,
-          destination: `/_next-spa${route.page.replace('/_', '/:')}/index.html`
+          destination: `/_next-spa${route.page}/index.html`
         })
       } else {
         const source = route.pattern
@@ -47,7 +47,7 @@ const getRewrites = async (routes: any, config: any, fullRewrite: boolean) => {
     const nextSPAConfig = config.nextSPA || {}
     dynamicRewrites.push({
       source: '**',
-      destination: nextSPAConfig.fallback ? path.resolve(nextSPAConfig.fallback) : '/404.html',
+      destination: nextSPAConfig.fallback ? path.join('.', nextSPAConfig.fallback) : '/404.html',
     })
   }
 
