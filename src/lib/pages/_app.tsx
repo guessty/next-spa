@@ -1,7 +1,7 @@
 import * as React from 'react'
 import App, { Container } from 'next/app'
 //
-import { withSPARouter } from './../routes'
+import withSPARouter from './../components/withSPARouter'
 
 export default withSPARouter(
   class extends App {

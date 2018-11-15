@@ -31,13 +31,13 @@ const generateDirRoutes = (dir: any, pathString:string = undefined, routes: any 
         page: '/',
       }
       routes.push(route)
-    } else if (page === '/404' || page === '/404/index') {
+    } else if (page === '/_404' || page === '/404' || page === '/404/index') {
       const route = {
         pattern: '/404.html',
         page: '/404',
       }
       routes.push(route)
-    } else if (page !== '/_app' && page !== '/_document' && page !== '/_error' && page !== '/soft-404') {
+    } else if (page !== '/_app' && page !== '/_document' && page !== '/_error') {
       const route = {
         pattern: page.replace('/index', '').replace('/_', '/:'),
         page: page.replace('/index', ''),
@@ -95,6 +95,15 @@ const withSPA = (config: any = {}) => {
 
   const exportPathMap = generateExportPathMap(routes, nextSPAConfig)
 
+  const spaEntries = nextSPAConfig.fallback ? {
+    'static/build/pages/_404.js': [ path.join(__dirname, '..', '..', 'lib/pages/_404.js') ],
+    [`static/build/pages/${nextSPAConfig.fallback.replace('.html', '')}.js`]: [
+      path.join(__dirname, '..', '..', 'lib/pages/_soft404.js')
+    ],
+  } : {
+    'static/build/pages/_404.js': [ path.join(__dirname, '..', '..', 'lib/pages/_soft404.js') ],
+  }
+
   const nextConfig = {
     ...baseNextConfig,
     distDir: path.relative(path.resolve(argvPath), path.resolve(baseNextConfig.distDir)),
@@ -111,8 +120,7 @@ const withSPA = (config: any = {}) => {
       const entry = async () => {
         return {
           ... await coreEntry(),
-          'static/build/pages/404.js': [ path.join(__dirname, '..', '..', 'lib/pages/404.js') ],
-          'static/build/pages/soft-404.js': [ path.join(__dirname, '..', '..', 'lib/pages/soft-404.js') ]
+          ...spaEntries,
         }
       }
       config.entry = entry
