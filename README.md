@@ -1,20 +1,7 @@
 # next-spa
 
-SPA support for NextJS - as well as a few other useful features.
+Extends NextJS' export functionailty allowing you to create statically generate apps with SPA style handling of dynamic routes.
 
-## What, but why?!
-
-NextJS is awesome when it comes to creating server rendered apps, but for me there are a few things missing when using NextJS as a static exporter.
-
-This package builds on the export functionailty by providing 2 core features:
-
-1) Dynamic directory based routing, based on `next-routes`.
-
-2) Client-side SPA style handling of any dynamic routes.
-
-`next-spa` also comes with some bonus features:
-
-3) A simple global store using `unstated`.
 
 ## Installation
 
@@ -22,10 +9,27 @@ This package builds on the export functionailty by providing 2 core features:
 
 2) Add scripts to package.json
   a) `"spa:dev": "next-spa dev"`
-  ) `"spa:build": "next-spa build"`
 
-2) `create-next-firebase <my-app>`
 
-3) `cd <my-app>`
+## Features
 
-4) `yarn start`
+1) Dynamic file-system routing.
+
+2) Client-side SPA style handling for dynamic routes.
+
+
+### Dynamic file-system routing
+
+Under the hood `next-spa` uses `next-routes` to enable dynamic routing.
+
+`next-spa` takes this one step further and enables dynamic routing using the `/pages` file system.
+
+To add a dymanic route simply prefix the file name with an `_` e.g:
+
+-- /pages
+  -- /index.js
+  -- /user
+    -- /_id.js
+  
+
+

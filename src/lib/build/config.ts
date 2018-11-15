@@ -1,9 +1,9 @@
 const path = require('path')
 const fs = require('fs')
+const findUp = require('find-up')
+const parseArgs = require('minimist')
 const requireFoolWebpack = require('require-fool-webpack')
 //
-
-const dir = path.resolve('.')
 
 const normalizePath = (path: any) => path.replace(/\\/g, '/')
 
@@ -31,7 +31,13 @@ const generateDirRoutes = (dir: any, pathString:string = undefined, routes: any 
         page: '/',
       }
       routes.push(route)
-    } else if (page !== '/_app' && page !== '/_document') {
+    } else if (page === '/404' || page === '/404/index') {
+      const route = {
+        pattern: '/404.html',
+        page: '/404',
+      }
+      routes.push(route)
+    } else if (page !== '/_app' && page !== '/_document' && page !== '/_error' && page !== '/soft-404') {
       const route = {
         pattern: page.replace('/index', '').replace('/_', '/:'),
         page: page.replace('/index', ''),
@@ -42,50 +48,71 @@ const generateDirRoutes = (dir: any, pathString:string = undefined, routes: any 
   return routes
 } 
 
-const generateExportPathMap = async (routes: any) => {
+const generateExportPathMap = (routes: any, nextSPAConfig: any) => {
   const allRoutes = [
-    ...routes,
     { pattern: '/404.html', page: '/404' },
-    { pattern: '/spa-fallback.html', page: '/spa-fallback' },
+    ...routes,
+    ...nextSPAConfig.fallback
+      ? [{ pattern: `/${nextSPAConfig.fallback}`, page: 'soft-404' }]
+      : [{ pattern: '/404.html', page: '/soft-404' }] ,
   ]
+  
   return allRoutes.reduce((routeMap, route) => {
-    routeMap[route.pattern] = { page: route.page }
+    const pattern = route.pattern.includes('/:') ? `/_next-spa${route.pattern}`: route.pattern
+    routeMap[pattern] = { page: route.page }
+
     return routeMap
   }, {})
 }
 
-const withSPAFallback = async (config: any = {}) => {
-  console.log(config)
+const withSPA = (config: any = {}) => {
+  const argv = parseArgs(process.argv.slice(2), {
+    alias: {
+      h: 'help'
+    },
+    boolean: ['h']
+  })
+
+  const argvPath = argv._[0] || '.'
+
   const baseNextConfig: any = {
     publicRuntimeConfig: {},
     assetPrefix: '',
-    dir: './',
-    distDir: './dist',
+    webpack: (config: any) => config,
     ...config,
+    distDir: config.distDir && config.distDir !== '.' && config.distDir !== './'
+      ? config.distDir : './.next',
   }
 
-  const routes = generateDirRoutes(path.join(baseNextConfig.dir, 'pages'))
+  const nextSPAConfig = config.nextSPA || {}
 
-  const exportPathMap = await generateExportPathMap(routes)
+  let pagesDir = path.join(path.resolve(argvPath), 'pages')
+  if (argvPath === config.distDir) {
+    const buildId = fs.readFileSync(`${argvPath}/BUILD_ID`, 'utf8')
+    pagesDir = path.join(path.resolve(argvPath), `static/${buildId}/pages`)
+  }
+  const routes = generateDirRoutes(pagesDir)
+
+  const exportPathMap = generateExportPathMap(routes, nextSPAConfig)
 
   const nextConfig = {
     ...baseNextConfig,
-    distDir: path.relative(
-      path.resolve(baseNextConfig.dir),
-      path.resolve(path.join(baseNextConfig.distDir, 'build'))
-    ),
+    distDir: path.relative(path.resolve(argvPath), path.resolve(baseNextConfig.distDir)),
     exportPathMap: () => exportPathMap,
     publicRuntimeConfig: {
       ...baseNextConfig.publicRuntimeConfig,
       routes,
     },
-    webpack: (config:any, options:any) => {
+    generateBuildId: async () => {
+      return 'build'
+    },
+    webpack: async (config:any, options:any) => {
       const coreEntry = config.entry
       const entry = async () => {
         return {
           ... await coreEntry(),
-          'static/build/pages/spa-fallback.js': [ path.join(__dirname, '..', '..', 'lib/pages/spa-fallback.js') ],
-          'static/build/pages/404.js': [ path.join(__dirname, '..', '..', 'lib/pages/404.js') ]
+          'static/build/pages/404.js': [ path.join(__dirname, '..', '..', 'lib/pages/404.js') ],
+          'static/build/pages/soft-404.js': [ path.join(__dirname, '..', '..', 'lib/pages/soft-404.js') ]
         }
       }
       config.entry = entry
@@ -93,20 +120,25 @@ const withSPAFallback = async (config: any = {}) => {
     },
   }
 
-  console.log(nextConfig)
+  return nextConfig
+}
+
+export const loadConfig = (dir: string, dev: boolean = false) => {
+  const nextConfigSource: string = findUp.sync('next.config.js', {
+    cwd: dir
+  })
+
+  let nextConfig = {}
+
+  if (nextConfigSource && nextConfigSource.length) {
+    try {
+      nextConfig = dev ? requireFoolWebpack(nextConfigSource) : require(`${nextConfigSource}`)
+    } catch {
+      console.log('Using default next.js config')
+    }
+  }
 
   return nextConfig
 }
 
-export const buildConfig = async () => {
-  const nextConfigSource = path.join(dir, 'next.config')
-  let nextConfig = {}
-  try {
-    nextConfig = requireFoolWebpack(nextConfigSource)
-  } catch {
-    console.log('Using default next.js config')
-  }
-  return withSPAFallback(nextConfig)
-}
-
-export default withSPAFallback
+export default withSPA

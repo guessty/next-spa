@@ -7,5 +7,5 @@ commander
   .version(pkg.version)
   .description(pkg.description)
   .command('dev', 'start the development server')
-  .command('build', 'build and export the project to static html')
+  .command('start', 'start the production server')
   .parse(process.argv)
