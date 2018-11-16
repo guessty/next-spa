@@ -1,7 +1,7 @@
 {
   "name": "next-spa",
-  "version": "0.1.0",
-  "description": "A preconfigured solution for hosting a React app on Google Firebase.",
+  "version": "0.2.0",
+  "description": "SPA functionaity including dynamic file-system routing for NextJS",
   "main": "index.js",
   "types": "index.d.ts",
   "repository": "https://github.com/guessty/next-spa.git",
