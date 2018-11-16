@@ -9,47 +9,28 @@ const getDynamicSource = (route: any) => {
   }).join('/')
 }
 
+
 const getRewrites = async (routes: any, config: any, fullRewrite: boolean) => {
   const staticRewrites: any = []
   const dynamicRewrites: any = []
 
-  if (fullRewrite) {
-    routes.forEach((route: any) => {
-      if (route.pattern.includes('/:')) {
-        const source = getDynamicSource(route.pattern)
-        dynamicRewrites.push({
-          source,
-          destination: `/_next-spa${route.page}/index.html`
-        })
-      } else {
-        const source = route.pattern
-        const expression = /(.html|.json)/
-        const destination = expression.test(source) ? source : path.join(source, 'index.html')
-        staticRewrites.push({
-          source,
-          destination,
-        })
-      
-      }
-    })
-  } else {
-    routes.forEach((route: any) => {
-      if (!route.pattern.includes('/:')) {
-        const source = route.pattern
-        const expression = /(.html|.json)/
-        const destination = expression.test(source) ? source : path.join(source, 'index.html')
-        staticRewrites.push({
-          source,
-          destination,
-        }) 
-      }
-    })
-    const nextSPAConfig = config.nextSPA || {}
-    dynamicRewrites.push({
-      source: '**',
-      destination: nextSPAConfig.fallback ? path.join('.', nextSPAConfig.fallback) : '/404.html',
-    })
-  }
+  routes.forEach((route: any) => {
+    if (route.pattern.includes('/:')) {
+      const source = getDynamicSource(route.pattern)
+      const nextSPAConfig = config.nextSPA || {}
+      const fallback = nextSPAConfig.fallback ? path.join('.', nextSPAConfig.fallback) : '/404.html';
+      dynamicRewrites.push({
+        source,
+        destination: fullRewrite ? `/_next-spa${route.page}.html` : fallback
+      })
+    } else {
+      const source = route.pattern
+      staticRewrites.push({
+        source,
+        destination: `${route.page}.html`,
+      })
+    }
+  })
 
   return [
     ...staticRewrites,
