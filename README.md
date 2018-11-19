@@ -1,13 +1,20 @@
 # next-spa
 
-Extends NextJS' export functionailty allowing you to create statically generate apps with SPA style handling of dynamic routes.
+SPA functionality with dynamic file-system routing for NextJS
+
+
+## Aim
+
+This project was created with one simple goal in mind:
+
+"To add dynamic route handling to static sites built with NextJS"
 
 
 ## Features
 
-1) Dynamic file-system routing. __You can even make use of this if your developing an SSR app!__
+1) Dynamic file-system routing. __You can even make use of this if you're developing an SSR app!__
 
-2) Client-side SPA style handling of dynamic routes.
+2) Client-side SPA route handling of dynamic routes.
 
 3) Generate hosting config for serve.js and Now.sh 
 
@@ -19,8 +26,7 @@ Extends NextJS' export functionailty allowing you to create statically generate 
 
 1) `npm i --save next-spa` or `yarn add next-spa`
 
-2) Add `next-spa` dev script to package.json
-  - `"spa:dev": "next-spa dev"`
+2) Add `next-spa` dev script to package.json: `"spa:dev": "next-spa dev"`
 
 
 ### Add 'withSPA' to 'next.config.js':
@@ -35,7 +41,7 @@ module.exports = withSPA({
 
 ### SPA fallback - 404.html:
 
-By default `next-spa` is configured to export a 404.html file as the default SPA fallback. This fallback file handles the client redirecting for your dynamic routes.
+By default `next-spa` is configured to export a `404.html` file as the default SPA fallback. This fallback file handles the client redirecting for your dynamic routes.
 
 You can change the name of the fallback file in your `next.config.js` file:
 
@@ -52,18 +58,21 @@ module.exports = withSPA({
 
 ### Add 'withSPARouter' to 'pages/_app.js':
 
-This step is only necessary if you are using a custom `_app.js` file or wish to use a custom PageLoader (see next step).
+Create custom `_app.js` file and connect the SPA Router. This file will also be required if you wish to use a custom PageLoader (see next step).
 
 ```javascript
 import App, { Container } from 'next/app'
 import { withSPRouter } from 'next-spa/router'
 
 class _App extends App {
-  static async getInitialProps({ Component, ctx }) {
-    ...
-  }
-  render() {
-    ...
+  render () {
+    const { Component, pageProps } = this.props
+
+    return (
+      <Container>
+        <Component {...pageProps} />
+      </Container>
+    )
   }
 }
 
@@ -74,7 +83,7 @@ export default withSPARouter(_App)
 
 `next-spa` comes with a default PageLoader that is displayed on dynamic routes while the client is loading.
 
-You can override the default PageLoader in `_app.j`:
+You can override the default PageLoader in `_app.js`:
 
 ```javascript
 import App, { Container } from 'next/app'
@@ -121,6 +130,15 @@ The file name that you use will be the key that gets passed to the `query` objec
 For static sites, the slug value (or `id` in the above example) won't be available in the query object until the component has mounted on the client. 
 
 
+### Replace next/link & next/router
+
+Under the hood `next-spa` uses `next-routes` for its dynamic routing; also exposing the `Link` and `Router` apis. 
+
+Be sure to replace any `next/link` or `next/router` import with `next-spa/link` or `next-spa/router` equivalent.
+
+Refer to the `next-routes` documentation for guidence on `Link` and `Router`.
+
+
 ### Run the dev environment:
 
 To run a dev environment you have to replace your the `next dev` command with `next-spa dev`.
@@ -159,9 +177,6 @@ app.prepare()
 ### Build and Export your app:
 
 You can still use the same NextJS commands to build (`next build`) and export (`next export`) your app.
-
-**Note:**
-Any dynamic routes will be exported to `<outdir>/_next-spa`. These are not used by default but can be used in when defining Hosting Rewrites.
 
 
 ### Serve you app:
