@@ -59,8 +59,16 @@ const generateExportPathMap = (routes: any, nextSPAConfig: any) => {
   
   return allRoutes.reduce((routeMap, route) => {
     const normalisedPattern = route.pattern.replace('.html', '')
-    const routeKey = normalisedPattern.includes('/:')
-      ? `/_next-spa${normalisedPattern.replace('/:', '/_')}`: normalisedPattern
+
+    let routeKey = normalisedPattern
+
+    if (routeKey.includes('/:')) {
+      if (nextSPAConfig.exportDynamicPages) {
+        routeMap[`${routeKey.replace('/:', '/_')}.html`] = { page: route.page }
+      }
+      return routeMap
+    }
+
     routeMap[`${routeKey === '/' ? '/index.html' : `${routeKey}.html`}`] = { page: route.page }
 
     return routeMap

@@ -8,10 +8,8 @@ import buildServeDeploymentConfig from './../lib/build/deployment/serve'
 async function generateConfig () {
   const argv = parseArgs(process.argv.slice(2), {
     alias: {
-      f: 'fullrewrite',
       o: 'outdir'
     },
-    boolean: ['f'],
     default: { o: null }
   })
 
@@ -19,7 +17,7 @@ async function generateConfig () {
   const config = loadConfig(dir)
   const outdir = argv.outdir ? path.resolve(argv.outdir) : path.resolve(dir, 'out')
 
-  buildServeDeploymentConfig(config, outdir, argv.fullrewrite)
+  buildServeDeploymentConfig(config, outdir)
 }
 
 generateConfig()

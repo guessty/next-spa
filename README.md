@@ -23,7 +23,7 @@ Extends NextJS' export functionailty allowing you to create statically generate 
   - `"spa:dev": "next-spa dev"`
 
 
-### Add `withSPA` to `next.config.js`:
+### Add 'withSPA' to 'next.config.js':
 
 ```javascript
 const withSPA = require('next-spa').withSPA
@@ -50,10 +50,9 @@ module.exports = withSPA({
 })
 ```
 
-### Add `withSPARouter` to `pages/_app.js`:
+### Add 'withSPARouter' to 'pages/_app.js':
 
-**Note:**
-This step is only necessary if you are using a custom `_app.js` file.
+This step is only necessary if you are using a custom `_app.js` file or wish to use a custom PageLoader (see next step).
 
 ```javascript
 import App, { Container } from 'next/app'
@@ -71,15 +70,48 @@ class _App extends App {
 export default withSPARouter(_App)
 ```
 
+### Custom 'PageLoader':
+
+`next-spa` comes with a default PageLoader that is displayed on dynamic routes while the client is loading.
+
+You can override the default PageLoader in `_app.j`:
+
+```javascript
+import App, { Container } from 'next/app'
+import { withSPRouter } from 'next-spa/router'
+
+import MyCustomLoader from '../components/MyCustomLoader'
+
+class _App extends App {
+  static async getInitialProps({ Component, ctx }) {
+    ...
+  }
+  render() {
+    const { Component, pageProps } = this.props
+    return (
+      <Container>
+        <Component {...pageProps} PageLoader={MyCustomLoader} />
+      </Container>
+    )
+  }
+}
+
+export default withSPARouter(_App)
+```
+
+
 ### Add your first dynamic route:
 
 Dynamic file-system routes require their names to be prefixed with an underscore (`_`) eg:
 
 ```bash
--- /pages
-  -- /index.js
-  -- /products
-    -- /_id.js
+- pages
+  |
+  - index.js
+  |
+  - products
+    |
+    - _id.js
 
 ```
 
@@ -96,7 +128,7 @@ To run a dev environment you have to replace your the `next dev` command with `n
 **Note:**
 If you are using `next-spa` in a SSR app you will also need to replace the `next start` command with `next-spa start`.
 
-**Note**
+**Note:**
 If you are using a custom server then you will also need to add `next-spa` configutation your server file:
 
 ```javascript
@@ -128,7 +160,7 @@ app.prepare()
 
 You can still use the same NextJS commands to build (`next build`) and export (`next export`) your app.
 
-**Note**
+**Note:**
 Any dynamic routes will be exported to `<outdir>/_next-spa`. These are not used by default but can be used in when defining Hosting Rewrites.
 
 
@@ -152,25 +184,30 @@ Command:
 
 Command options:
 - `-o <outdir>` __Should be the path to your exported site__
-- `-f`- __Boolean to change the rewrite type and enable "full rewrites"__
 
 **Note:**
 The same config file can also be used if you are deploying serverlessly through Now.sh
 
 
-### The Full Rewrite Type:
+### Export dynamic page:
 
-The full rewrite option enables something special 
+You can also optionally export static versions of your dynamic pages as well.
 
+These exported pages will contain the same spa functionality as your fallback file allowing you to use rewrites to point your dynamic routes to these files instead.
 
+You can enable dynamic page exports through your `next.config.js` file.
 
+```javascript
+const withSPA = require('next-spa').withSPA
 
+module.exports = withSPA({
+  ...yourNextConfig,
+  nextSPA: {
+    fallback: 'spa-fallback.html',
+    exportDynamicPages: true,
+  }
+})
+```
 
-
-
-
-
-
-  
-
-
+**Note:**
+If using the `next-spa create-serve-config` to create `serve.js` rewrites, `next-spa` will automatically configure your dynamic routes to point to their associated page.

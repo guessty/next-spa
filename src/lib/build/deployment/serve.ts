@@ -10,27 +10,27 @@ const getDynamicSource = (route: any) => {
 }
 
 
-const getRewrites = async (routes: any, config: any, fullRewrite: boolean) => {
-  const staticRewrites: any = []
-  const dynamicRewrites: any = []
+const getRewrites = async (routes: any, config: any) => {
+  const nextSPAConfig = config.nextSPA || {}
 
-  routes.forEach((route: any) => {
-    if (route.pattern.includes('/:')) {
-      const source = getDynamicSource(route.pattern)
-      const nextSPAConfig = config.nextSPA || {}
-      const fallback = nextSPAConfig.fallback ? path.join('.', nextSPAConfig.fallback) : '/404.html';
-      dynamicRewrites.push({
-        source,
-        destination: fullRewrite ? `/_next-spa${route.page}.html` : fallback
-      })
-    } else {
+  const staticRewrites = routes.filter((route: any) =>
+    !route.pattern.includes('/:')).map((route: any) => {
       const source = route.pattern
-      staticRewrites.push({
+      return {
         source,
-        destination: `${route.page}.html`,
-      })
-    }
-  })
+        destination: `${route.page === '/' ? '/index.html' : `${route.page}.html`}`,
+      }
+    })
+  
+  const dynamicRewrites = routes.filter((route: any) =>
+    route.pattern.includes('/:')).map((route: any) => {
+      const fallback = nextSPAConfig.fallback ? path.join('./', nextSPAConfig.fallback) : '/404.html'
+      const source = getDynamicSource(route.pattern)
+      return {
+        source,
+        destination: nextSPAConfig.exportDynamicPages ? `${route.page}.html` : fallback,
+      }
+    })
 
   return [
     ...staticRewrites,
@@ -38,10 +38,11 @@ const getRewrites = async (routes: any, config: any, fullRewrite: boolean) => {
   ]
 }
 
-export default async function buildServeDeploymentConfig (config: any, outdir: string, fullRewrite: boolean) {
+export default async function buildServeDeploymentConfig (config: any, outdir?: string) {
   const routes = config.publicRuntimeConfig.routes
-  const serveRewrites = await getRewrites(routes, config, fullRewrite)
+  const serveRewrites = await getRewrites(routes, config)
   const serveJSONConfig = JSON.stringify({
+    trailingSlash: true,
     rewrites: serveRewrites
   }, null, 2)
 
