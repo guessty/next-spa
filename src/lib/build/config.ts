@@ -95,7 +95,7 @@ const withSPA = (config: any = {}) => {
   const isBuild = argvPath === config.distDir
   if (isBuild || nextSPAConfig.generateRoutesFromBuild) {
     const buildId = fs.readFileSync(`${config.distDir}/BUILD_ID`, 'utf8')
-    pagesDir = path.join(path.resolve(argvPath), `static/${buildId}/pages`)
+    pagesDir = path.join(path.resolve(config.distDir), `static/${buildId}/pages`)
   }
   const routes = generateDirRoutes(pagesDir)
 
