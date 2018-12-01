@@ -17,10 +17,12 @@ export default (opts: any) => {
     default: { p: 3000 }
   })
   const dir = path.resolve(argv._[0] || '.')
+  
   const config: any = loadConfig(dir)
 
   const conf = {
     ...config,
+    ...opts.conf ? opts.conf : {},
     ...opts.dev ? { distDir: path.relative(dir, path.resolve('./tmp/.next')) } : {}
   }
 

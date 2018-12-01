@@ -92,8 +92,8 @@ const withSPA = (config: any = {}) => {
   const nextSPAConfig = config.nextSPA || {}
 
   let pagesDir = path.join(path.resolve(argvPath), 'pages')
-  if (argvPath === config.distDir) {
-    const buildId = fs.readFileSync(`${argvPath}/BUILD_ID`, 'utf8')
+  if (process.env.NODE_ENV === 'production') {
+    const buildId = fs.readFileSync(`${config.distDir}/BUILD_ID`, 'utf8')
     pagesDir = path.join(path.resolve(argvPath), `static/${buildId}/pages`)
   }
   const routes = generateDirRoutes(pagesDir)
