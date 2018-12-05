@@ -1,4 +1,3 @@
-import getConfig from 'next/config'
 const path = require('path')
 const parseArgs = require('minimist')
 
@@ -32,8 +31,7 @@ export default (opts: any) => {
 
   const ServerInstance = new Server({ ...opts, dir, conf, })
 
-  const { publicRuntimeConfig = { routes: [] } } = getConfig() || {};
-  const { routes } = publicRuntimeConfig
+  const { publicRuntimeConfig: { routes } }: { publicRuntimeConfig: { routes: [] } } = config || {};
   const Routes = buildRoutes(routes)
   const handler = Routes.getRequestHandler(ServerInstance)
 

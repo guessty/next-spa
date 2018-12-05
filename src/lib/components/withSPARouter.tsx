@@ -1,8 +1,9 @@
 import * as React from 'react'
-
-import Routes, { Router } from './../routes'
+import getConfig from 'next/config'
+//
 import Loader from './pageLoader'
-
+const buildRoutes = require('./../build/routes')
+//
 
 export default (App: any) => class extends React.Component {
   static async getInitialProps(appContext: any) {
@@ -14,7 +15,6 @@ export default (App: any) => class extends React.Component {
     }
   }
   state = {
-    isSPAPath: this.isSPAPath(),
     ready: this.isReady()
   }
   componentDidMount() {
@@ -23,17 +23,24 @@ export default (App: any) => class extends React.Component {
   async checkPath() {
     const { router }: any = this.props
     if (this.isSPAPath()) {
-      await Router.pushRoute(router.asPath)
+      await router.pushRoute(router.asPath)
       this.setState({
         isReady: true
       })
     }
   }
   isSPAPath() {
+    const { publicRuntimeConfig: { routes } } = getConfig()
+    const Routes = buildRoutes(routes)
     const { router }: any = this.props
-    const routes = Routes.routes.filter((route: any) => route.pattern.includes('/:'))
-    const potentialMatches = routes.filter((route: any) => route.regex.test(router.asPath))
-    return !!potentialMatches.length
+    const staticRoutes = Routes.routes.filter((route: any) => !route.pattern.includes('/:'))
+    const potentialStaticMatches = staticRoutes.filter((route: any) => route.regex.test(router.asPath))
+    if (potentialStaticMatches.length) {
+      return false;
+    }
+    const dynamicRoutes = Routes.routes.filter((route: any) => route.pattern.includes('/:'))
+    const potentialDynamicMatches = dynamicRoutes.filter((route: any) => route.regex.test(router.asPath))
+    return !!potentialDynamicMatches.length
   }
   isReady() {
     const { router }: any = this.props
@@ -41,8 +48,8 @@ export default (App: any) => class extends React.Component {
   }
   render() {
     const { pageProps }: any = this.props
-    const { isSPAPath, isReady }: any = this.state
-    const isPageLoading = isSPAPath && !isReady
+    const { isReady }: any = this.state
+    const isPageLoading = this.isSPAPath() && !isReady
 
     const appProps = {
       ...this.props,
