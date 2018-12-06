@@ -5,7 +5,7 @@ import Loader from './pageLoader'
 const buildRoutes = require('./../build/routes')
 //
 
-export default (App: any) => class extends React.Component {
+export default (App: any) => class _App extends React.Component {
   static async getInitialProps(appContext: any) {
     const appProps = (typeof App.getInitialProps === 'function') ?
       await App.getInitialProps(appContext) : {}
@@ -14,8 +14,9 @@ export default (App: any) => class extends React.Component {
       ...appProps,
     }
   }
+  static Routes = buildRoutes(getConfig().publicRuntimeConfig.routes || [])
   state = {
-    ready: this.isReady()
+    ready: this.isReady(),
   }
   componentDidMount() {
     this.checkPath()
@@ -23,22 +24,20 @@ export default (App: any) => class extends React.Component {
   async checkPath() {
     const { router }: any = this.props
     if (this.isSPAPath()) {
-      await router.pushRoute(router.asPath)
+      await _App.Routes.Router.pushRoute(router.asPath)
       this.setState({
         isReady: true
       })
     }
   }
   isSPAPath() {
-    const { publicRuntimeConfig: { routes } } = getConfig()
-    const Routes = buildRoutes(routes)
     const { router }: any = this.props
-    const staticRoutes = Routes.routes.filter((route: any) => !route.pattern.includes('/:'))
+    const staticRoutes = _App.Routes.routes.filter((route: any) => !route.pattern.includes('/:'))
     const potentialStaticMatches = staticRoutes.filter((route: any) => route.regex.test(router.asPath))
     if (potentialStaticMatches.length) {
       return false;
     }
-    const dynamicRoutes = Routes.routes.filter((route: any) => route.pattern.includes('/:'))
+    const dynamicRoutes = _App.Routes.routes.filter((route: any) => route.pattern.includes('/:'))
     const potentialDynamicMatches = dynamicRoutes.filter((route: any) => route.regex.test(router.asPath))
     return !!potentialDynamicMatches.length
   }

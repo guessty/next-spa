@@ -1,6 +1,6 @@
 {
   "name": "next-spa",
-  "version": "0.3.7",
+  "version": "0.3.8",
   "description": "SPA functionality with dynamic file-system routing for NextJS",
   "main": "index.js",
   "types": "index.d.ts",
