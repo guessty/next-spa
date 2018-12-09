@@ -21,7 +21,7 @@ export default async (routes: any, config: any) => {
   
   const dynamicRewrites = routes.filter((route: any) =>
     route.pattern.includes('/:')).map((route: any) => {
-      const fallback = nextSPAConfig.fallback ? path.join('./', nextSPAConfig.fallback) : '/404.html'
+      const fallback = nextSPAConfig.fallback ? `/${nextSPAConfig.fallback}` : '/404.html'
       const source = getDynamicSource(route.pattern)
       return {
         source,
