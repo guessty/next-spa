@@ -62,7 +62,7 @@ Create custom `_app.js` file and connect the SPA Router. This file will also be 
 
 ```javascript
 import App, { Container } from 'next/app'
-import { withSPRouter } from 'next-spa/router'
+import { withSPARouter } from 'next-spa/router'
 
 class _App extends App {
   render () {
